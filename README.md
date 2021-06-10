@@ -182,6 +182,26 @@ Now we substitute the roll, yaw and pitch in the correction matrix
 ROT_final = ROT_final.subs({'r': roll, 'p': pitch, 'y': yaw})
 ```
 The equation to get the position of the wrist is:
+<img src = "./images/WC.JPG">
+```python
+WC = EE - 0.303*(ROT_final[:,2]) #dG = 0.303
+```
+From the wrist centre, we can calculate all the 6 angles(θ1 to θ6)  
+#### Calculating the angles:
+θ1 = atan2(Wy,Wx)
+```python
+# theta1
+theta1 = atan2(WC[1], WC[0])
+```
+We calculate θ2 and θ3 with the help of trigonometry
+<img src = "./">
+In the above diagram, we have a triangle with sides A, B and C and angles a,b and c. 
+```python
+A = 1.501
+B = sqrt((sqrt(WC[0]**2 + WC[1]**2) - 0.35)**2 + (WC[2]-0.75)**2)
+C = 1.25
+```
+We can use cosine law to calculate the angles of the triangle(a,b and c)
 
 
 ## Project Implementation
