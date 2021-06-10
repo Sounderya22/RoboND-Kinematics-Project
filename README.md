@@ -219,14 +219,20 @@ theta3 = pi/2 - b - 0.036
 ##### Inverse Orientation problem
 For the Inverse Orientation problem, we need to find values of the final three joint variables.  
 Using the individual DH transforms, we can get the resultant rotation matrix  
-<img src = "./images/R1.JPG">
+
+<img src = "./images/R1.JPG">  
+
 Since the overall RPY (Roll Pitch Yaw) rotation between base_link and gripper_link must be equal to the product of individual rotations between respective links,  
-<img src = "./images/R2.JPG">
+
+<img src = "./images/R2.JPG">  
+
 where,  
 Rrpy = Homogeneous RPY rotation between base_link and gripper_link as calculated above.  
 
 We can substitute the values we calculated for joints 1 to 3 in their respective individual rotation matrices and pre-multiply both sides of the above equation by inv(R0_3)  
-<img src = "./images/R3.JPG">
+
+<img src = "./images/R3.JPG">  
+
 The resultant matrix on the RHS does not have any variables after substituting the joint angle values. So this equation will give us the required equations for joint 4, 5, and 6.
 
 ```python
@@ -241,6 +247,8 @@ theta4 = atan2(R3_6[2,2], -R3_6[0,2])
 theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
 theta6 = atan2(-R3_6[1,1], R3_6[1,0])
 ```
+The calculation of the 6 joint angles from the end effector's pose and orientation completes the Inverse Kinematics Problem. 
+The output of the provided test cases are attached below:  
 
 ## Project Implementation
 
