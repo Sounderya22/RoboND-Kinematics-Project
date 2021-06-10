@@ -115,8 +115,10 @@ We multiply the individual matrices to get the composition of all the transforms
 ```python
 T0_EE = simplify(T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_EE)
 ```
-We can check this matrix with the help of forward_kinematics.launch file. We can compare the values of the matrix with the values we get in RViZ to see how accurate the values are
+We can check this matrix with the help of forward_kinematics.launch file. We can compare the values of the matrix with the values we get in RViZ to see how accurate the values are  
 
+<img src = "./images/Test Case RViZ.JPG">
+<img src = "./images/Test Case python.JPG">
 ### 3. Decouple Inverse Kinematics problem into Inverse Position Kinematics and inverse Orientation Kinematics; doing so derive the equations to calculate all individual joint angles.
 
 And here's where you can draw out and show your math for the derivation of your theta angles. 
