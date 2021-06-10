@@ -121,7 +121,7 @@ We can check this matrix with the help of forward_kinematics.launch file. We can
 <img src = "./images/Test Case python.JPG">  
 
 ### 3. Decoupling Inverse Kinematics problem into Inverse Position Kinematics and inverse Orientation Kinematics; and deriving the equations to calculate all individual joint angles.  
-Since the last three joints in our robot are revolute and their joint axes intersect at a single point, we have a case of spherical wrist with joint_5 being the common intersection point and hence the wrist center.This allows us to kinematically decouple the IK problem into Inverse Position and Inverse Orientation problems as discussed in the Inverse Kinematics. 
+Since the last three joints in our robot are revolute and their joint axes intersect at a single point, we have a case of spherical wrist with joint_5 being the common intersection point and hence the wrist center. This allows us to kinematically decouple the IK problem into Inverse Position and Inverse Orientation problems as discussed in the Inverse Kinematics. 
 
 The matrix can be represented in the following way  
 
@@ -188,6 +188,7 @@ WC = EE - 0.303*(ROT_final[:,2]) #dG = 0.303
 ```
 From the wrist centre, we can calculate all the 6 angles(θ1 to θ6)  
 #### Calculating the angles:
+##### Inverse Position problem
 θ1 = atan2(Wy,Wx)
 ```python
 # theta1
@@ -201,8 +202,45 @@ A = 1.501
 B = sqrt((sqrt(WC[0]**2 + WC[1]**2) - 0.35)**2 + (WC[2]-0.75)**2)
 C = 1.25
 ```
-We can use cosine law to calculate the angles of the triangle(a,b and c)
+We can use cosine law to calculate the angles of the triangle(a,b and c)  
 
+<img src = "./images/Claw.JPG">  
+
+```python
+a = acos((B * B + C * C - A * A) / (2 * B * C))
+b = acos((A * A + C * C - B * B) / (2 * A * C))
+c = acos((A * A + B * B - C * C ) / (2 * A * B))
+```  
+From the triangle, we can calculate θ2 and θ3  
+```python
+theta2 = pi/2 - a - atan2(WC[2] - 0.75, sqrt(WC[0] * WC[0] + WC[1] * WC[1]) - 0.35)
+theta3 = pi/2 - b - 0.036
+```
+##### Inverse Orientation problem
+For the Inverse Orientation problem, we need to find values of the final three joint variables.  
+Using the individual DH transforms, we can get the resultant rotation matrix  
+<img src = "./images/R1.JPG">
+Since the overall RPY (Roll Pitch Yaw) rotation between base_link and gripper_link must be equal to the product of individual rotations between respective links,  
+<img src = "./images/R2.JPG">
+where,  
+Rrpy = Homogeneous RPY rotation between base_link and gripper_link as calculated above.  
+
+We can substitute the values we calculated for joints 1 to 3 in their respective individual rotation matrices and pre-multiply both sides of the above equation by inv(R0_3)  
+<img src = "./images/R3.JPG">
+The resultant matrix on the RHS does not have any variables after substituting the joint angle values. So this equation will give us the required equations for joint 4, 5, and 6.
+
+```python
+R0_3 = T0_1[0:3,0:3] * T1_2[0:3,0:3] * T2_3[0:3,0:3]
+R0_3 = R0_3.evalf(subs={q1: theta1, q2:theta2, q3: theta3})
+R3_6 = R0_3.inv(method = "LU") * ROT_final
+```  
+We can now calculate θ4, θ5 and θ6
+```python
+# theta4, theta5 and theta6
+theta4 = atan2(R3_6[2,2], -R3_6[0,2])
+theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
+theta6 = atan2(-R3_6[1,1], R3_6[1,0])
+```
 
 ## Project Implementation
 
