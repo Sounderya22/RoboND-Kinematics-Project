@@ -123,13 +123,19 @@ We can check this matrix with the help of forward_kinematics.launch file. We can
 ### 3. Decoupling Inverse Kinematics problem into Inverse Position Kinematics and inverse Orientation Kinematics; and deriving the equations to calculate all individual joint angles.  
 Since the last three joints in our robot are revolute and their joint axes intersect at a single point, we have a case of spherical wrist with joint_5 being the common intersection point and hence the wrist center.This allows us to kinematically decouple the IK problem into Inverse Position and Inverse Orientation problems as discussed in the Inverse Kinematics. 
 
-Since we have the case of a spherical wrist involving joints 4,5,6, the position of the wrist center is governed by the first three joints. We can obtain the position of the wrist center by using the complete transformation matrix we derived in the last section based on the end-effector pose.  
+The matrix can be represented in the following way  
 
-The matrix can be represented in the following way 
 <img src = "./images/mat.JPG">
+
 where l, m and n are orthonormal vectors representing the end-effector orientation along X, Y, Z axes of the local coordinate frame.  
 Since n is the vector along the z-axis of the gripper_link, we can derive the position of the wrist center in the following way:  
 <img src = "./images/wrist.JPG">
+
+where,  
+P<sub>x</sub>, P<sub>y</sub>, P<sub>z</sub> = end-effector positions  
+W<sub>x</sub>, W<sub>y</sub>, W<sub>z</sub> = wrist positions  
+d6 - from the DH table  
+l = end-effector length(also equal to d7)
 
 First, we get the end effector pose and orientation from the test cases
 ```python
@@ -175,6 +181,7 @@ Now we substitute the roll, yaw and pitch in the correction matrix
 ```python
 ROT_final = ROT_final.subs({'r': roll, 'p': pitch, 'y': yaw})
 ```
+The equation to get the position of the wrist is:
 
 
 ## Project Implementation
