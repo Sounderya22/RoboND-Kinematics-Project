@@ -86,6 +86,37 @@ DH convention uses four individual transforms,
 ### <p align = "center"> <sup>*i*-1</sup><sub>*i*</sub>T = R(x<sub>*i*-1</sub>,α<sub>*i*-1</sub>)T(x<sub>*i*-1</sub>,a<sub>*i*-1</sub>)R(z<sub>*i*</sub>,θ<sub>*i*</sub>)R(z<sub>*i*</sub>,d<sub>*i*</sub>) </p>
 to describe the relative translation and orientation of link (i-1) to link (i). In matrix form, this transform is,  
 
+<img src="./images/Tfmat.JPG">
+
+Now to get the individual transformation matrices, we write a function that takes in the DH parameters and returns the transformation matrix
+```python
+# Define Modified DH Transformation matrix
+def DH_tfmat(alpha, a, d, q):
+	TF = Matrix([
+		[cos(q), 		       -sin(q), 		     0, 		     a],
+	        [sin(q)*cos(alpha), 	cos(q)*cos(alpha), 	-sin(alpha), 	-sin(alpha)*d],
+	     	[sin(q)* sin(alpha), 	cos(q)*sin(alpha), 	 cos(alpha), 	 cos(alpha)*d],
+	     	[0,			            0,			         0,		         1]
+	    ])
+	return TF
+```
+We substitute the DH parameters in the matrix to get the individual transformation matrices
+```python
+# Create individual transformation matrices
+T0_1 = DH_tfmat(alpha0, a0, d1, q1).subs(DH_Table)
+T1_2 = DH_tfmat(alpha1, a1, d2, q2).subs(DH_Table)
+T2_3 = DH_tfmat(alpha2, a2, d3, q3).subs(DH_Table)
+T3_4 = DH_tfmat(alpha3, a3, d4, q4).subs(DH_Table)
+T4_5 = DH_tfmat(alpha4, a4, d5, q5).subs(DH_Table)
+T5_6 = DH_tfmat(alpha5, a5, d6, q6).subs(DH_Table)
+T6_EE = DH_tfmat(alpha6, a6, d7, q7).subs(DH_Table)
+```
+We multiply the individual matrices to get the composition of all the transforms from the base_link to the gripper
+```python
+T0_EE = simplify(T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_EE)
+```
+We can check this matrix with the help of forward_kinematics.launch file. We can compare the values of the matrix with the values we get in RViZ to see how accurate the values are
+
 ### 3. Decouple Inverse Kinematics problem into Inverse Position Kinematics and inverse Orientation Kinematics; doing so derive the equations to calculate all individual joint angles.
 
 And here's where you can draw out and show your math for the derivation of your theta angles. 
