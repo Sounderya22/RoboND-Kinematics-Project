@@ -111,7 +111,7 @@ T4_5 = DH_tfmat(alpha4, a4, d5, q5).subs(DH_Table)
 T5_6 = DH_tfmat(alpha5, a5, d6, q6).subs(DH_Table)
 T6_EE = DH_tfmat(alpha6, a6, d7, q7).subs(DH_Table)
 ```
-We multiply the individual matrices to get the composition of all the transforms from the base_link to the gripper
+We multiply the individual matrices to get the homogeneous transform matrix from base_link to gripper_link
 ```python
 T0_EE = simplify(T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_EE)
 ```
@@ -120,11 +120,62 @@ We can check this matrix with the help of forward_kinematics.launch file. We can
 <img src = "./images/Test Case RViZ.JPG">
 <img src = "./images/Test Case python.JPG">  
 
-### 3. Decouple Inverse Kinematics problem into Inverse Position Kinematics and inverse Orientation Kinematics; doing so derive the equations to calculate all individual joint angles.
+### 3. Decoupling Inverse Kinematics problem into Inverse Position Kinematics and inverse Orientation Kinematics; and deriving the equations to calculate all individual joint angles.  
+Since the last three joints in our robot are revolute and their joint axes intersect at a single point, we have a case of spherical wrist with joint_5 being the common intersection point and hence the wrist center.This allows us to kinematically decouple the IK problem into Inverse Position and Inverse Orientation problems as discussed in the Inverse Kinematics. 
 
-And here's where you can draw out and show your math for the derivation of your theta angles. 
+Since we have the case of a spherical wrist involving joints 4,5,6, the position of the wrist center is governed by the first three joints. We can obtain the position of the wrist center by using the complete transformation matrix we derived in the last section based on the end-effector pose.  
 
-![alt text][image2]
+The matrix can be represented in the following way 
+<img src = "./images/mat.JPG">
+where l, m and n are orthonormal vectors representing the end-effector orientation along X, Y, Z axes of the local coordinate frame.  
+Since n is the vector along the z-axis of the gripper_link, we can derive the position of the wrist center in the following way:  
+<img src = "./images/wrist.JPG">
+
+First, we get the end effector pose and orientation from the test cases
+```python
+# Extract end-effector position and orientation from request
+# px,py,pz = end-effector position
+# roll, pitch, yaw = end-effector orientation
+px = req.poses[x].position.x
+py = req.poses[x].position.y
+pz = req.poses[x].position.z
+
+(roll, pitch, yaw) = tf.transformations.euler_from_quaternion(
+	[req.poses[x].orientation.x, req.poses[x].orientation.y,
+        	req.poses[x].orientation.z, req.poses[x].orientation.w])
+		
+EE = Matrix([[px],[py],[pz]])
+```
+There's a difference in the definition of the gripper reference frame in the URDF and DH parameters. So we need to define a correction matrix to account for this difference.  
+The rotation and correction matrix are as follows:
+```python
+# Rotation matrix of the end effector
+r, p , y = symbols('r p y')
+
+ROT_x = Matrix([[1, 0 ,      0],
+                [0, cos(r), -sin(r)],
+                [0, sin(r), cos(r)]]) 
+
+ROT_y = Matrix([[cos(p), 	0 , 	sin(p)],
+                [0, 		1, 	    0],
+                [-sin(p), 	0, 	    cos(p)]]) 
+
+ROT_z = Matrix([[cos(y), -sin(y), 0],
+                [sin(y), cos(y), 0],
+                [0, 0, 1]]) 
+                       
+ROT_xyz = ROT_z * ROT_y * ROT_x
+
+# Compensate for rotation discrepancy between DH parameters and Gazebo
+ROT_corr = ROT_z.subs(y, radians(180)) * ROT_y.subs(p, radians(-90))
+ROT_final = simplify(ROT_xyz * ROT_corr)
+```
+Now we substitute the roll, yaw and pitch in the correction matrix
+
+```python
+ROT_final = ROT_final.subs({'r': roll, 'p': pitch, 'y': yaw})
+```
+
 
 ## Project Implementation
 
@@ -135,6 +186,5 @@ Here I'll talk about the code, what techniques I used, what worked and why, wher
 
 
 And just for fun, another example image:
-![alt text][image3]
 
 
