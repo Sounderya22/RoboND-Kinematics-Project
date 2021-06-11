@@ -1,10 +1,54 @@
 # Project: Kinematics Pick & Place
 ---  
 # Setting up the environment
+---
+To get started with the project, we have to first set up our workspace. We can set up our workspace either in a virtual machine or we can Ubunutu+ROS installed loacally.  
+
+The name of the workspace for this project is catkin_ws. We start with creating the workspace.  
+
+```sh
+$ mkdir -p ~/catkin_ws/src
+$ cd ~/catkin_ws/
+$ catkin_make
+```  
+Now, we clone the repository in the src directory of the workspace
+
+```sh
+$ cd ~/catkin_ws/src
+$ git clone https://github.com/udacity/RoboND-Kinematics-Project.git
+```  
+Now we have to install missing dependencies using the  `$ rosdep install` command:  
+```sh
+$ cd ~/catkin_ws
+$ rosdep install --from-paths src --ignore-src --rosdistro=kinetic -y
+```  
+Next we should change the permissions of script files to turn them executable:  
+```sh
+$ cd ~/catkin_ws/src/RoboND-Kinematics-Project/kuka_arm/scripts
+$ sudo chmod u+x target_spawn.py
+$ sudo chmod u+x IK_server.py
+$ sudo chmod u+x safe_spawner.sh
+```
+Now we have to build the project
+```sh
+$ cd ~/catkin_ws
+$ catkin_make
+```  
+Since the pick and place simulator spins up different nodes in separate terminals, you need to add the following to your .bashrc file for auto-sourcing:  
+```sh
+$ source ~/catkin_ws/devel/setup.bash
+```
+As this project uses custom 3D models, we need to inform Gazebo (our simulation software) where to look for them. This can be easily accomplished by adding a single line to the .bashrc  
+Open a terminal window and type in the following:  
+
+```sh
+$ echo "export GAZEBO_MODEL_PATH=~/catkin_ws/src/RoboND-Kinematics-Project/kuka_arm/models" >> ~/.bashrc
+```  
+For the demo mode, set the demo value to **true** in the `inverse_kinematics.launch` file under `~/catkin_ws/src/RoboND-Kinematics-Project/kuka_arm/launch/`
+
+That completes the set up process.  
 
 ---
-
-
 # [Rubric](https://review.udacity.com/#!/rubrics/972/view) Points
 ## Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
@@ -263,7 +307,5 @@ To run the code and see the results in the simulation:
 
 Please find attached the video of a successful Pick & Place cycle
 
-<figure class="video_container">
-  <iframe src="https://youtu.be/4V9RBBXNDYM" allowfullscreen="true"> </iframe>
-</figure>
+[![test video](https://github.com/Sounderya22/RoboND-Kinematics-Project/blob/bed37e0f48e2d2e914cd800412e9b7cccac7e916/images/Thumbnail.JPG)](https://youtu.be/4V9RBBXNDYM)
 
