@@ -194,8 +194,10 @@ From the wrist centre, we can calculate all the 6 angles(θ1 to θ6)
 # theta1
 theta1 = atan2(WC[1], WC[0])
 ```
-We calculate θ2 and θ3 with the help of trigonometry
-<img src = "./">
+We calculate θ2 and θ3 with the help of trigonometry  
+
+<img src = "./images/Diagram.jpeg">  
+
 In the above diagram, we have a triangle with sides A, B and C and angles a,b and c. 
 ```python
 A = 1.501
