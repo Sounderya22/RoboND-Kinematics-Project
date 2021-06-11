@@ -1,11 +1,9 @@
 # Project: Kinematics Pick & Place
+---  
+# Setting up the environment
 
 ---
-[//]: # (Image References)
 
-[image1]: ./misc_images/misc1.png
-[image2]: ./misc_images/misc3.png
-[image3]: ./misc_images/misc2.png
 
 # [Rubric](https://review.udacity.com/#!/rubrics/972/view) Points
 ## Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
@@ -13,7 +11,7 @@
 ---
 ## Kinematic Analysis
 ### 1. Deriving the DH parameters by analyzing the URDF file
-By analyzing the kr210.urdf.xacro file, we can get the xyz and rpy value of every joint in the arm. From that, we can calculate the DH parameters. 
+By analyzing the `kr210.urdf.xacro` file, we can get the xyz and rpy value of every joint in the arm. From that, we can calculate the DH parameters. 
 
 DH Parameters  
 * α<sub>i-1</sub>(twist angle) = angle between Z<sub>i-1</sub> and Z<sub>i</sub> measured about X<sub>i-1</sub>  
@@ -113,9 +111,9 @@ T6_EE = DH_tfmat(alpha6, a6, d7, q7).subs(DH_Table)
 ```
 We multiply the individual matrices to get the homogeneous transform matrix from base_link to gripper_link
 ```python
-T0_EE = simplify(T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_EE)
+T0_EE = T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_EE
 ```
-We can check this matrix with the help of forward_kinematics.launch file. We can compare the values of the matrix with the values we get in RViZ to see how accurate the values are  
+We can check this matrix with the help of `forward_kinematics.launch` file. We can compare the values of the matrix with the values we get in RViZ to see how accurate the values are  
 
 <img src = "./images/Test Case RViZ.JPG">
 <img src = "./images/Test Case python.JPG">  
@@ -174,7 +172,7 @@ ROT_xyz = ROT_z * ROT_y * ROT_x
 
 # Compensate for rotation discrepancy between DH parameters and Gazebo
 ROT_corr = ROT_z.subs(y, radians(180)) * ROT_y.subs(p, radians(-90))
-ROT_final = simplify(ROT_xyz * ROT_corr)
+ROT_final = ROT_xyz * ROT_corr
 ```
 Now we substitute the roll, yaw and pitch in the correction matrix
 
@@ -251,15 +249,21 @@ theta6 = atan2(-R3_6[1,1], R3_6[1,0])
 ```
 The calculation of the 6 joint angles from the end effector's pose and orientation completes the Inverse Kinematics Problem. 
 The output of the provided test cases are attached below:  
+<img src = "./images/TC1.JPG">  
+
+<img src = "./images/TC2.JPG">  
+
+<img src = "./images/TC3.JPG">  
 
 ## Project Implementation
+To run the code and see the results in the simulation:  
+* Complete the `IK_server.py` and `IK_debug.py` as discussed above
+* Optimize the code to reduce run time(For eg, I removed the simplify function wherever it wasn't needed)
+* Set the demo value to "false" in the `inverse_kinematics.launch`  
 
-### 1. Fill in the `IK_server.py` file with properly commented python code for calculating Inverse Kinematics based on previously performed Kinematic Analysis. Your code must guide the robot to successfully complete 8/10 pick and place cycles. Briefly discuss the code you implemented and your results. 
+Please find attached the video of a successful Pick & Place cycle
 
-
-Here I'll talk about the code, what techniques I used, what worked and why, where the implementation might fail and how I might improve it if I were going to pursue this project further.  
-
-
-And just for fun, another example image:
-
+<figure class="video_container">
+  <iframe src="https://youtu.be/4V9RBBXNDYM" allowfullscreen="true"> </iframe>
+</figure>
 
