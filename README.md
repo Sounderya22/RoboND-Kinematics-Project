@@ -248,7 +248,7 @@ C = 1.25
 ```
 We can use cosine law to calculate the angles of the triangle(a,b and c)  
 
-<img src = "./images/Claw.JPG">  
+<img src = "./images/Claw.png">  
 
 ```python
 a = acos((B * B + C * C - A * A) / (2 * B * C))
